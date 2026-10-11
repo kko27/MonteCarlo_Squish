@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svMultiPhysicsFile version="0.1">
+  <GeneralSimulationParameters>
+    <Continue_previous_simulation> false </Continue_previous_simulation>
+    <Number_of_spatial_dimensions> 3 </Number_of_spatial_dimensions>
+    <Number_of_time_steps> 300 </Number_of_time_steps>
+    <Time_step_size> 0.05 </Time_step_size>
+    <Spectral_radius_of_infinite_time_step> 0.50 </Spectral_radius_of_infinite_time_step>
+    <Searched_file_name_to_trigger_stop> STOP_SIM </Searched_file_name_to_trigger_stop>
+
+    <Save_results_to_VTK_format> true </Save_results_to_VTK_format>
+    <Name_prefix_of_saved_VTK_files> result </Name_prefix_of_saved_VTK_files>
+    <Increment_in_saving_VTK_files> 1 </Increment_in_saving_VTK_files>
+    <Start_saving_after_time_step> 1 </Start_saving_after_time_step>
+
+    <Increment_in_saving_restart_files> 1000 </Increment_in_saving_restart_files>
+    <Convert_BIN_to_VTK_format> 0 </Convert_BIN_to_VTK_format>
+
+    <Verbose> 1 </Verbose>
+    <Warning> 1 </Warning>
+    <Debug> 0 </Debug>
+  </GeneralSimulationParameters>
+
+<Add_mesh name="msh">
+  <Mesh_file_path> mesh_scaled/mesh-complete.mesh.vtu </Mesh_file_path>
+
+  <Add_face name="wall_top">
+    <Face_file_path> mesh_scaled/mesh-surfaces/sphere_top.vtp </Face_file_path>
+  </Add_face>
+
+  <Add_face name="wall_bottom">
+    <Face_file_path> mesh_scaled/mesh-surfaces/sphere_bottom.vtp </Face_file_path>
+  </Add_face>
+
+  <Add_face name="pin_axis_top">
+    <Face_file_path> mesh_scaled/mesh-surfaces/pin_axis_top.vtp </Face_file_path>
+  </Add_face>
+
+  <Add_face name="pin_axis_bottom">
+    <Face_file_path> mesh_scaled/mesh-surfaces/pin_axis_bottom.vtp </Face_file_path>
+  </Add_face>
+
+  <Fiber_direction_file_path> mesh_scaled/fibersLong.vtu </Fiber_direction_file_path>
+  <Fiber_direction_file_path> mesh_scaled/fibersSheet.vtu </Fiber_direction_file_path>
+
+  <Domain_file_path> mesh_scaled/mesh-complete.domains.vtu </Domain_file_path>
+
+  </Add_mesh>
+
+<Add_equation type="ustruct" >
+  <Coupled> true </Coupled>
+  <Min_iterations> 1 </Min_iterations>
+  <Max_iterations> 8 </Max_iterations>
+  <Tolerance> 1.0e-03 </Tolerance>
+
+  <Domain id="1">
+
+  <Density> 1.05e-9 </Density>                                <!-- 1.05 g/cm^3 --> 
+  <Elasticity_modulus> 200.0 </Elasticity_modulus>            <!-- 200 Pa --> 
+  <Poisson_ratio> 0.450000 </Poisson_ratio>
+  <Constitutive_model type="neoHookean"> </Constitutive_model>
+  <Dilational_penalty_model> ST91 </Dilational_penalty_model>
+  
+  <Active_stress>
+    <Model> TanhFiberStretch </Model>
+    <Directional_distribution>
+      <Fiber_direction> 1.0 </Fiber_direction>
+      <Sheet_direction> 0.0 </Sheet_direction>
+      <Sheet_normal_direction> 0.0 </Sheet_normal_direction>
+    </Directional_distribution>
+    <TanhFiberStretch>
+      <a1> 3.75 </a1>
+      <a2> 0.8 </a2>
+      <Ramp> false </Ramp>
+      <Temporal_values_file_path> activation_cardioid.dat </Temporal_values_file_path>
+    </TanhFiberStretch>
+  </Active_stress>
+
+  </Domain> 
+
+  <Domain id="2">
+
+  <Density> 1.05e-9 </Density>                                <!-- 1.05 g/cm^3 --> 
+  <Elasticity_modulus> 200.0 </Elasticity_modulus>            <!-- 200 Pa --> 
+  <Poisson_ratio> 0.450000 </Poisson_ratio>
+  <Constitutive_model type="neoHookean"> </Constitutive_model>
+  <Dilational_penalty_model> ST91 </Dilational_penalty_model>
+
+  </Domain> 
+
+    <Output type="Spatial" >
+      <Displacement> true </Displacement>
+      <Velocity> true </Velocity>
+      <Jacobian> true </Jacobian>
+      <Stress> true </Stress>
+      <Strain> true </Strain>
+      <Cauchy_stress> true </Cauchy_stress>
+      <Def_grad> true </Def_grad>
+      <VonMises_stress> true </VonMises_stress>
+      <Active_tension_fibers> true </Active_tension_fibers>
+      <Active_tension_sheets> true </Active_tension_sheets>
+      <Active_tension_normal> true </Active_tension_normal>
+      <Fiber_stretch> true </Fiber_stretch>
+      <Fiber_direction> true </Fiber_direction>
+    </Output>
+
+    <LS type="GMRES">
+    <Linear_algebra type="fsils">
+      <Preconditioner> fsils </Preconditioner>
+    </Linear_algebra>
+    <Tolerance> 1.0e-3 </Tolerance>
+    <Max_iterations> 2500 </Max_iterations>
+    </LS>
+
+  <Add_BC name="wall_top">
+    <Type> RigidPlanePenalty </Type>
+    <Penalty_factor> 1e2 </Penalty_factor>
+    <Plane_point> (0.0, 0.0, 348.0) </Plane_point>
+    <Plane_normal> (0.0, 0.0, 1.0) </Plane_normal>
+    <Time_dependence> Unsteady </Time_dependence>
+    <Temporal_values_file_path> top_plate_step.dat </Temporal_values_file_path>
+    <Ramp_function> false </Ramp_function>
+  </Add_BC>
+
+  <Add_BC name="wall_bottom">
+    <Type> RigidPlanePenalty </Type>
+    <Penalty_factor> 1e2 </Penalty_factor>
+    <Plane_point> (0.0, 0.0, -348.0) </Plane_point>
+    <Plane_normal> (0.0, 0.0, -1.0) </Plane_normal>
+    <Time_dependence> Unsteady </Time_dependence>
+    <Temporal_values_file_path> bottom_plate_step.dat </Temporal_values_file_path>
+    <Ramp_function> true </Ramp_function>
+  </Add_BC>
+
+  <Add_BC name="pin_axis_top">
+    <Type> Dirichlet </Type>
+    <Value> 0.0 </Value>
+    <Effective_direction> (1, 1, 0) </Effective_direction>
+  </Add_BC>
+
+  <Add_BC name="pin_axis_bottom">
+    <Type> Dirichlet </Type>
+    <Value> 0.0 </Value>
+    <Effective_direction> (1, 1, 0) </Effective_direction>
+  </Add_BC>
+
+  </Add_equation>
+</svMultiPhysicsFile>
+
+

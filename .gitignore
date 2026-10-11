@@ -1,0 +1,15 @@
+.DS_Store
+__pycache__/
+
+# Sweep inputs (regenerate with Generator/generate_orientations.py)
+Samples/s*/
+
+# Sweep outputs
+Samples/sweep_log.csv
+Samples/force_statistics.csv
+Samples/sample_metrics.csv
+Samples/mc_*.png
+sweep_*.out
+sweep_*.err
+postprocess_*.out
+postprocess_*.err

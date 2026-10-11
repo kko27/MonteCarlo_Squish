@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Name of your job
+#SBATCH --job-name=Squish4-M
+#SBATCH --partition=amarsden
+#SBATCH --output=test.o%j
+#SBATCH --error=test.e%j
+#SBATCH --time=24:00:00
+#SBATCH --qos=normal
+#SBATCH --nodes=1
+#SBATCH --mem=8000
+#SBATCH --ntasks-per-node=24
+#SBATCH --mail-user=kbko@stanford.edu
+#SBATCH --mail-type=begin
+#SBATCH --mail-type=end
+
+module --force purge
+module load devel
+module load math
+module load imkl/2019
+module load cuda/10.2.89
+module load openmpi/4.0.3
+module load hdf5/1.10.6
+module load gcc/12.4.0
+module load freetype/2.8.1
+module load libxml2/2.9.4
+module load libxkbcommon/0.9.1
+module load libfabric/1.9.1
+module load ucx/1.8.1
+module load system
+
+module load szip/2.1.1
+module load cmake/3.24.2
+module load libpng/1.2.57
+module load fontconfig/2.12.4
+module load llvm/4.0.0
+module load x11/7.7
+module load zlib/1.2.11
+export LD_LIBRARY_PATH=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared/lib:$LD_LIBRARY_PATH
+PATH=$PATH:$HOME/.local/bin:$HOME/bin
+export PATH
+export VTK_DIR=/home/groups/amarsden/lib-perigee/VTK-7.1.1-shared
+
+srun /home/users/kbko/ActiveStressSquish/svMultiPhysics/build/svMultiPhysics-build/bin/svmultiphysics solver_tanH.xml
