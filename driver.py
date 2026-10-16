@@ -11,7 +11,7 @@ A run is stopped early and the worker moves on when
 
 With --postprocess, every DONE sample is handed to that command right away (the
 sample directory is appended as the last argument).  submit_sweep.sbatch uses it to
-write net_reaction_force.csv and delete the result_*.vtu files, so 1000 runs fit
+write section_force.csv and delete the result_*.vtu files, so 1000 runs fit
 on $SCRATCH.  A sample whose post-processing fails or is cut off stays DONE and is
 picked up again by submit_postprocess.sbatch.
 
@@ -107,9 +107,9 @@ def cmd_status(args):
     print('  '.join('{}={}'.format(k, counts.get(k, 0))
                     for k in (rf.PENDING, rf.RUNNING) + rf.FINISHED))
     n_force = sum(1 for s, st in statuses.items() if st == rf.DONE and
-                  any(os.path.exists(os.path.join(s, d, 'net_reaction_force.csv'))
+                  any(os.path.exists(os.path.join(s, d, 'section_force.csv'))
                       for d in os.listdir(s) if d.endswith('-procs')))
-    print('DONE with net_reaction_force.csv: {}'.format(n_force))
+    print('DONE with section_force.csv: {}'.format(n_force))
     if args.verbose:
         for s, st in statuses.items():
             owner = rf.read_owner(s) if st != rf.PENDING else ''

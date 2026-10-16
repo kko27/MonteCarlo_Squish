@@ -6,8 +6,8 @@
 #   sbatch submit_postprocess.sbatch                        # whole trace
 #   sbatch submit_postprocess.sbatch --tmin 5 --tmax 6.25   # statistics on a time window
 #
-# Resubmitting is safe; samples that already have net_reaction_force.csv are skipped.
-# Outputs: Samples/sNNNN/24-procs/net_reaction_force.csv, Samples/force_statistics.csv,
+# Resubmitting is safe; samples that already have section_force.csv are skipped.
+# Outputs: Samples/sNNNN/24-procs/section_force.csv, Samples/force_statistics.csv,
 #          Samples/sample_metrics.csv, Samples/mc_*.png
 
 #SBATCH --job-name=MCPost

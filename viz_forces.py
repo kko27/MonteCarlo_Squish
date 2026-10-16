@@ -1,6 +1,6 @@
-import numpy as np 
-import os 
-from matplotlib import pyplot as plt 
+import numpy as np
+import os
+from matplotlib import pyplot as plt
 
 
 fold_list = ['./rot000/24-procs/', './rot045/24-procs/', './rot090/24-procs/',
@@ -13,47 +13,18 @@ TIMEEND = 125
 
 plt.figure(figsize=(8, 5))
 
-for fold in fold_list: 
-    file_name = "net_reaction_force.csv"
+# Platen force from the mid-height cross-section (section_force.csv, written by 05).
+# Top and bottom platens carry the same force in equilibrium, so one plot covers both.
+for fold in fold_list:
+    file_name = "section_force.csv"
     data = np.loadtxt(os.path.join(fold, file_name), delimiter=',', skiprows=1)
     time_s = data[TIMESTART:TIMEEND,0]
-    sphere_top_Fz = data[TIMESTART:TIMEEND,3]/1e6       # Convert to µN
-    plt.plot(time_s, np.abs(sphere_top_Fz), label= name_list[fold_list.index(fold)], linewidth=1)
+    platen_Fz = data[TIMESTART:TIMEEND,1]/1e6       # Convert to µN
+    plt.plot(time_s, np.abs(platen_Fz), label= name_list[fold_list.index(fold)], linewidth=1)
 
 plt.xlabel("Time (s)", fontsize = 14)
 plt.ylabel("Force (µN)", fontsize = 14)
 plt.legend(fontsize = 14)
 plt.grid(True)
-plt.savefig("reaction_force_top.png", dpi=450)
-plt.clf() 
-
-for fold in fold_list: 
-    file_name = "net_reaction_force.csv"
-    data = np.loadtxt(os.path.join(fold, file_name), delimiter=',', skiprows=1)
-    time_s = data[TIMESTART:TIMEEND,0]
-    sphere_bot_Fz = data[TIMESTART:TIMEEND,7]/1e6       # Convert to µN
-    plt.plot(time_s, np.abs(sphere_bot_Fz), label= name_list[fold_list.index(fold)], linewidth=1)
-
-plt.xlabel("Time (s)", fontsize = 14)
-plt.ylabel("Force (µN)", fontsize = 14)
-plt.legend(fontsize = 14)
-plt.grid(True)
-plt.savefig("reaction_force_bottom.png", dpi=450)
-plt.clf() 
-
-for fold in fold_list: 
-    file_name = "net_reaction_force.csv"
-    data = np.loadtxt(os.path.join(fold, file_name), delimiter=',', skiprows=1)
-    time_s = data[TIMESTART:TIMEEND,0]
-    sphere_top_Fz = data[TIMESTART:TIMEEND,3]/1e6       # Convert to µN
-    sphere_bot_Fz = data[TIMESTART:TIMEEND,7]/1e6
-    sphere_tot_Fz = np.abs(sphere_top_Fz) + np.abs(sphere_bot_Fz)
-    plt.plot(time_s, np.abs(sphere_tot_Fz), label= name_list[fold_list.index(fold)], linewidth=1)
-
-plt.xlabel("Time (s)", fontsize = 14)
-plt.ylabel("Force (µN)", fontsize = 14)
-plt.legend(fontsize = 14)
-plt.grid(True)
-plt.savefig("reaction_force_total.png", dpi=450)
-plt.clf() 
-
+plt.savefig("reaction_force.png", dpi=450)
+plt.clf()

@@ -13,8 +13,8 @@ The active layer is the crescent of `00_assign_domains.py`: cells with centroid 
 - `driver.py` / `run_functions.py`: sweep worker. Runs pending samples one after another, records the outcome of each in `Samples/sNNNN/status` and `Samples/sweep_log.csv`, and post-processes every DONE sample
 - `submit_sweep.sbatch`: Sherlock job script that runs one worker
 - `PostProcessor/postprocess_sample.sh`: called by the worker after each DONE run; loads the python modules/venv and runs `compute_reaction_forces.py --delete-vtu` on that sample
-- `PostProcessor/compute_reaction_forces.py`: platen reaction forces (`net_reaction_force.csv`), same calculation as `05_compute_reaction_force.py`; with `--delete-vtu` removes `result_*.vtu` once the CSV is written
-- `PostProcessor/compute_statistics.py`: Monte-Carlo statistics of |F_z| (top, bottom, total) over all samples
+- `PostProcessor/compute_reaction_forces.py`: platen force from horizontal cross-sections of the deformed sphere (`section_force.csv`), same calculation as `05_compute_reaction_force.py`; with `--delete-vtu` removes `result_*.vtu` once the CSV is written
+- `PostProcessor/compute_statistics.py`: Monte-Carlo statistics of the platen |F_z| over all samples
 - `submit_postprocess.sbatch`: catches up on any DONE sample without a CSV, then runs the statistics
 
 `00_assign_domains.py`, `05_compute_reaction_force.py` and `viz_forces.py` are the original single-run scripts and are not used by the sweep.
@@ -50,7 +50,7 @@ sbatch submit_postprocess.sbatch --tmin 5 --tmax 6.25    # statistics on a time 
 
 Outputs in `Samples/`:
 
-- `force_statistics.csv`: per time point, n, mean, std and 2.5/50/97.5 percentiles of |F_z| (µN) for top, bottom, and total
+- `force_statistics.csv`: per time point, n, mean, std and 2.5/50/97.5 percentiles of the platen |F_z| (µN)
 - `sample_metrics.csv`: per sample, orientation plus peak and mean |F_z| in the window
 - `mc_force_band.png`: mean force trace with the 2.5–97.5 percentile band
 - `mc_peak_hist.png`: distribution of the peak force

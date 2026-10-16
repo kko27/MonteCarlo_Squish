@@ -1,6 +1,6 @@
 #!/bin/bash
 # Per-sample post-processing called by `driver.py run --postprocess ...` after each
-# DONE simulation:  writes net_reaction_force.csv, then deletes the result_*.vtu.
+# DONE simulation:  writes section_force.csv, then deletes the result_*.vtu.
 #
 #   PostProcessor/postprocess_sample.sh Samples/s0001
 #

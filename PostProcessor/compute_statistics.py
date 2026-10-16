@@ -1,8 +1,10 @@
 """Monte-Carlo statistics of the platen force over the random active-layer orientations.
 
-Reads Samples/samples.txt and every Samples/sNNNN/<n>-procs/net_reaction_force.csv,
-and summarises |F_z| on the top plate, the bottom plate, and their sum
-(as in viz_forces.py).  Forces are reported in uN.
+Reads Samples/samples.txt and every Samples/sNNNN/<n>-procs/section_force.csv
+(written by compute_reaction_forces.py) and summarises the platen force |F_z|,
+taken from the mid-height cross-section.  In equilibrium the top and bottom
+platens carry the same force, so there is a single measure.  Forces are
+reported in uN.
 
 Usage (from the repository root):
     python3 PostProcessor/compute_statistics.py                  # whole trace
@@ -26,9 +28,9 @@ from matplotlib import pyplot as plt
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SAMPLES_DIR = os.path.join(ROOT_DIR, "Samples")
-CSV_NAME = "net_reaction_force.csv"
+CSV_NAME = "section_force.csv"
 
-MEASURES = ["top", "bottom", "total"]
+MEASURES = ["platen"]
 COLOR = "#2a78d6"            # line / markers
 BAND_COLOR = "#9ec5f4"       # 95% band
 PCTS = [2.5, 50.0, 97.5]
@@ -43,14 +45,12 @@ def read_samples():
 
 
 def load_forces(name):
-    """|F_z| in uN for top, bottom, total, plus time; None if the CSV is missing."""
+    """|F_z| in uN at the mid-height cut, plus time; None if the CSV is missing."""
     paths = glob.glob(os.path.join(SAMPLES_DIR, name, "*-procs", CSV_NAME))
     if not paths:
         return None
     data = np.loadtxt(paths[0], delimiter=",", skiprows=1, ndmin=2)
-    top = np.abs(data[:, 3]) / 1e6
-    bot = np.abs(data[:, 7]) / 1e6
-    return data[:, 0], {"top": top, "bottom": bot, "total": top + bot}
+    return data[:, 0], {"platen": np.abs(data[:, 1]) / 1e6}
 
 
 def main():
@@ -118,7 +118,8 @@ def main():
 
     # --- plots -------------------------------------------------------------------------
     tw = time[window]
-    fig, axes = plt.subplots(len(MEASURES), 1, figsize=(8, 9), sharex=True)
+    fig, axes = plt.subplots(len(MEASURES), 1, figsize=(8, 3 * len(MEASURES)), sharex=True, squeeze=False)
+    axes = axes.ravel()
     for ax, m in zip(axes, MEASURES):
         x = traces[m][:, window]
         lo, med, hi = np.percentile(x, PCTS, axis=0)
@@ -133,7 +134,8 @@ def main():
     fig.savefig(os.path.join(SAMPLES_DIR, "mc_force_band.png"), dpi=300)
     plt.close(fig)
 
-    fig, axes = plt.subplots(1, len(MEASURES), figsize=(12, 3.8))
+    fig, axes = plt.subplots(1, len(MEASURES), figsize=(4 * len(MEASURES), 3.8), squeeze=False)
+    axes = axes.ravel()
     for ax, m in zip(axes, MEASURES):
         ax.hist(peak[m], bins=min(40, max(5, n // 10)), color=COLOR, edgecolor="white", linewidth=1)
         for q in np.percentile(peak[m], [2.5, 97.5]):
@@ -144,7 +146,8 @@ def main():
     fig.savefig(os.path.join(SAMPLES_DIR, "mc_peak_hist.png"), dpi=300)
     plt.close(fig)
 
-    fig, axes = plt.subplots(1, len(MEASURES), figsize=(12, 3.8), sharex=True)
+    fig, axes = plt.subplots(1, len(MEASURES), figsize=(4 * len(MEASURES), 3.8), sharex=True, squeeze=False)
+    axes = axes.ravel()
     for ax, m in zip(axes, MEASURES):
         ax.scatter(theta, peak[m], s=10, color=COLOR, alpha=0.6, linewidths=0)
         ax.set_xlabel("cone-axis polar angle θ (deg)")
@@ -156,7 +159,8 @@ def main():
     plt.close(fig)
 
     k = np.arange(1, n + 1)
-    fig, axes = plt.subplots(1, len(MEASURES), figsize=(12, 3.8), sharex=True)
+    fig, axes = plt.subplots(1, len(MEASURES), figsize=(4 * len(MEASURES), 3.8), sharex=True, squeeze=False)
+    axes = axes.ravel()
     for ax, m in zip(axes, MEASURES):
         run_mean = np.cumsum(peak[m]) / k
         run_sq = np.cumsum(peak[m] ** 2) / k
