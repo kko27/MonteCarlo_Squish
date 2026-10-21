@@ -39,6 +39,9 @@ def cmd_run(args):
     results_dir = '{}-procs'.format(nprocs)
     if args.launcher == 'srun':
         cmd = ['srun', args.exe, 'solver.xml']
+    elif args.launcher == 'ibrun':
+        # TACC: ibrun takes the rank count from the Slurm allocation
+        cmd = ['ibrun', args.exe, 'solver.xml']
     else:
         cmd = ['mpirun', '-n', str(nprocs), args.exe, 'solver.xml']
     post_cmd = shlex.split(args.postprocess) if args.postprocess else None
@@ -139,7 +142,7 @@ def main():
 
     p_run = sub.add_parser('run', help='work through pending samples')
     p_run.add_argument('--exe', required=True, help='path to the svmultiphysics binary')
-    p_run.add_argument('--launcher', choices=['srun', 'mpirun'], default='srun')
+    p_run.add_argument('--launcher', choices=['srun', 'ibrun', 'mpirun'], default='srun')
     p_run.add_argument('--nprocs', type=int, help='MPI ranks (default: $SLURM_NTASKS)')
     p_run.add_argument('--time-limit', type=float, default=2 * 3600,
                        help='max seconds per simulation before it is killed (default 7200)')

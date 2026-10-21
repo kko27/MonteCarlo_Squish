@@ -168,7 +168,7 @@ def histor_has_diverged(histor_path):
 
 
 def kill_process_group(proc, grace=60):
-    """SIGTERM the solver (srun forwards it to the MPI ranks), then SIGKILL if needed."""
+    """SIGTERM the solver (srun/ibrun forward it to the MPI ranks), then SIGKILL if needed."""
     if proc.poll() is not None:
         return
     try:
